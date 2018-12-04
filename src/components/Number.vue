@@ -1,14 +1,23 @@
 <template>
   <div>
-    <div class="number" :class="{editable: editable}">
+
+    <number-pick @selected="selected" v-show="pickNumberViewVisible" :disabled="disabled" />
+
+    <div v-show="!pickNumberViewVisible" class="number" :class="{editable: editable}">
       <div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(0)" class="b">{{alternatives[0]}}</div><div :class="{transparent: number !==null}" @click="changeAlternative(1)" class="b wider">{{alternatives[1]}}</div><div :class="{transparent: number !==null}" @click="changeAlternative(2)" class="b">{{alternatives[2]}}</div>
+        <div :class="{transparent: number !==null}" @click="changeAlternative(0)" class="b">{{alternatives[0]}}</div>
+        <div :class="{transparent: number !==null}" @click="changeAlternative(1)" class="b wider">{{alternatives[1]}}</div>
+        <div :class="{transparent: number !==null}" @click="changeAlternative(2)" class="b">{{alternatives[2]}}</div>
       </div>
       <div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(3)" class="b taller">{{alternatives[3]}}</div><div @click="changeCenter" class="c taller" :class="{error: error}">{{number}}</div><div :class="{transparent: number !==null}" @click="changeAlternative(4)" class="b taller">{{alternatives[4]}}</div>
+        <div :class="{transparent: number !==null}" @click="changeAlternative(3)" class="b taller">{{alternatives[3]}}</div>
+        <div @click="changeCenter" class="c taller" :class="{error: error}">{{number}}</div>
+        <div :class="{transparent: number !==null}" @click="changeAlternative(4)" class="b taller">{{alternatives[4]}}</div>
       </div>
       <div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(5)" class="b">{{alternatives[5]}}</div><div :class="{transparent: number !==null}" @click="changeAlternative(6)" class="b wider">{{alternatives[6]}}</div><div :class="{transparent: number !==null}" @click="changeAlternative(7)" class="b">{{alternatives[7]}}</div>
+        <div :class="{transparent: number !==null}" @click="changeAlternative(5)" class="b">{{alternatives[5]}}</div>
+        <div :class="{transparent: number !==null}" @click="changeAlternative(6)" class="b wider">{{alternatives[6]}}</div>
+        <div :class="{transparent: number !==null}" @click="changeAlternative(7)" class="b">{{alternatives[7]}}</div>
       </div>
     </div>
   </div>
@@ -16,13 +25,19 @@
 
 <script>
 import Vue from 'vue'
+import NumberPick from '@/components/NumberPick.vue'
 
 export default {
   props: {
     index: Number
   },
+  components: {
+    NumberPick
+  },
   data () {
     return {
+      pickNumberViewVisibleAtIndex: false,
+      lastChange: null,
       alternatives: [
         null,
         null,
@@ -51,33 +66,46 @@ export default {
       })
       values.sort()
       return values
+    },
+    disabled () {
+      if (this.lastChange === 'center') {
+        return []
+      }
+      return this.alternatives
+    },
+    pickNumberViewVisible () {
+      return this.$root.pickNumberViewVisibleAtIndex === this.index
     }
   },
   methods: {
-    clearAlternative (i) {
-      Vue.set(this.alternatives, i, null)
+    selected (number) {
+      if (this.lastChange === 'center') {
+        Vue.set(this.$root.board, this.index, number)
+      } else {
+        Vue.set(this.alternatives, this.lastChange, number)
+      }
+      this.$root.pickNumberViewVisibleAtIndex = null
     },
     changeAlternative (i) {
-      if (!this.editable) { return }
+      if (!this.editable || this.number) { return }
       var number = this.alternatives[i]
       // start with the first one
-      if (number === null) { number = 1 }
-      while (this.alternativeValues.includes(number)) {
-        number += 1
+      if (number !== null) {
+        number = null
+        Vue.set(this.alternatives, i, number)
+      } else {
+        this.lastChange = i
+        this.$root.pickNumberViewVisibleAtIndex = this.index
       }
-      if (number > 9) { number = null }
-      Vue.set(this.alternatives, i, number)
     },
     changeCenter () {
       if (!this.editable) { return }
-      var number = this.$root.board[this.index]
-      if (number === null) {
-        number = 1
+      if (this.number !== null) {
+        Vue.set(this.$root.board, this.index, null)
       } else {
-        number += 1
-        if (number > 9) { number = null }
+        this.lastChange = 'center'
+        this.$root.pickNumberViewVisibleAtIndex = this.index
       }
-      Vue.set(this.$root.board, this.index, number)
     }
   }
 }
@@ -94,7 +122,6 @@ export default {
   background: #ffffff;
 }
 .b {
-  cursor: pointer;
   width: 1rem;
   height: 1rem;
   display: inline-block;
@@ -105,17 +132,25 @@ export default {
   color: #aaa;
 }
 .c {
-  cursor: pointer;
   width: 1.2rem;
   display: inline-block;
   vertical-align: middle;
   text-align: center;
   font-size: 1.2rem;
 }
+
 .editable {
-  .b:hover,
+  .b, .c {
+    cursor: pointer;
+  }
+}
+
+.editable {
+  .b:hover:not(.transparent),
   .c:hover {
-    background: #fafafa;
+    transition: background 0.3s;
+    background: #f5f5f5;
+    border-radius: 0.2rem;
   }
 }
 .taller {

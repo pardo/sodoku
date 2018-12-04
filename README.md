@@ -1,7 +1,5 @@
 # sodoku
 
-build
-
-npm run build && mv dist docs
+npm run build
 
 https://pardo.github.io/sodoku/

@@ -32,6 +32,7 @@ new Vue({
     board: [],
     boardState: [],
     boardSolved: [],
+    pickNumberViewVisibleAtIndex: null,
 
     block0: blockIndexes(0),
     block1: blockIndexes(3),
@@ -122,26 +123,27 @@ new Vue({
     }
   },
   created () {
-    axios.get('https://cors-anywhere.herokuapp.com/https://www.sudoku-online.org/getsudoku.php').then(response => {
+    if (process.env.NODE_ENV === 'production') {
+      axios.get('https://cors-anywhere.herokuapp.com/https://www.sudoku-online.org/getsudoku.php').then(response => {
+        this.loading = false
+        this.board = response.data.sudoku.split('').map(v => { return parseInt(v) || null })
+        this.boardState = this.board.map(v => {
+          return {
+            editable: v === null
+          }
+        })
+        this.boardSolved = response.data.solucion.split('').map(v => { return parseInt(v) || null })
+      })
+    } else {
       this.loading = false
-      this.board = response.data.sudoku.split('').map(v => { return parseInt(v) || null })
+      this.board = [null, 3, null, null, 2, 8, null, null, 5, 6, null, null, 9, 4, 5, 3, 2, null, null, null, 2, null, null, null, 4, null, null, 5, null, null, 4, 6, null, null, 7, null, null, null, 7, 2, null, null, null, null, 4, null, 4, null, 8, 7, null, null, 6, null, 4, 9, 6, 3, null, null, 7, 5, null, 2, null, null, null, null, null, null, null, 3, null, null, 3, 5, null, 6, null, 4, 8]
       this.boardState = this.board.map(v => {
         return {
           editable: v === null
         }
       })
-      this.boardSolved = response.data.solucion.split('').map(v => { return parseInt(v) || null })
-    })
-    /*
-    this.loading = false
-    this.board = [null, 3, null, null, 2, 8, null, null, 5, 6, null, null, 9, 4, 5, 3, 2, null, null, null, 2, null, null, null, 4, null, null, 5, null, null, 4, 6, null, null, 7, null, null, null, 7, 2, null, null, null, null, 4, null, 4, null, 8, 7, null, null, 6, null, 4, 9, 6, 3, null, null, 7, 5, null, 2, null, null, null, null, null, null, null, 3, null, null, 3, 5, null, 6, null, 4, 8]
-    this.boardState = this.board.map(v => {
-      return {
-        editable: v === null
-      }
-    })
-    this.boardSolved = [7, 3, 4, 6, 2, 8, 9, 1, 5, 6, 1, 8, 9, 4, 5, 3, 2, 7, 9, 5, 2, 1, 3, 7, 4, 8, 6, 5, 2, 1, 4, 6, 3, 8, 7, 9, 8, 6, 7, 2, 5, 9, 1, 3, 4, 3, 4, 9, 8, 7, 1, 5, 6, 2, 4, 9, 6, 3, 8, 2, 7, 5, 1, 2, 8, 5, 7, 1, 4, 6, 9, 3, 1, 7, 3, 5, 9, 6, 2, 4, 8]
-    */
+      this.boardSolved = [7, 3, 4, 6, 2, 8, 9, 1, 5, 6, 1, 8, 9, 4, 5, 3, 2, 7, 9, 5, 2, 1, 3, 7, 4, 8, 6, 5, 2, 1, 4, 6, 3, 8, 7, 9, 8, 6, 7, 2, 5, 9, 1, 3, 4, 3, 4, 9, 8, 7, 1, 5, 6, 2, 4, 9, 6, 3, 8, 2, 7, 5, 1, 2, 8, 5, 7, 1, 4, 6, 9, 3, 1, 7, 3, 5, 9, 6, 2, 4, 8]
+    }
   },
   render: h => h(App)
 }).$mount('#app')
