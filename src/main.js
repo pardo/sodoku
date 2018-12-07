@@ -120,12 +120,37 @@ new Vue({
         return true
       }
       return false
-    }
-  },
-  created () {
-    if (process.env.NODE_ENV === 'production') {
+    },
+    stateStr () {
+      return this.board.map((v, i) => {
+        return (this.boardState[i].editable ? '' : '!') + (v || '.')
+      }).join('')
+    },
+    loadStateStr (state) {
+      this.board = Array(81)
+      this.boardState = Array(81)
+      var i = 0
+      var editable = true
+      state.split('').forEach(v => {
+        if (v === '.') {
+          this.board[i] = null
+          this.boardState[i] = { editable: true }
+          i += 1
+          return
+        }
+        if (v === '!') {
+          editable = false
+          return
+        }
+        this.board[i] = parseInt(v)
+        this.boardState[i] = { editable: editable }
+        editable = true
+        i += 1
+      })
+    },
+    loadFromInternet () {
+      this.loading = true
       axios.get('https://cors-anywhere.herokuapp.com/https://www.sudoku-online.org/getsudoku.php').then(response => {
-        this.loading = false
         this.board = response.data.sudoku.split('').map(v => { return parseInt(v) || null })
         this.boardState = this.board.map(v => {
           return {
@@ -133,17 +158,42 @@ new Vue({
           }
         })
         this.boardSolved = response.data.solucion.split('').map(v => { return parseInt(v) || null })
+        this.loading = false
       })
-    } else {
+    },
+    loadFromUrl () {
+      this.loading = true
+      this.loadStateStr(this.$route.params.state)
       this.loading = false
+    },
+    loadDefault () {
+      this.loading = true
       this.board = [null, 3, null, null, 2, 8, null, null, 5, 6, null, null, 9, 4, 5, 3, 2, null, null, null, 2, null, null, null, 4, null, null, 5, null, null, 4, 6, null, null, 7, null, null, null, 7, 2, null, null, null, null, 4, null, 4, null, 8, 7, null, null, 6, null, 4, 9, 6, 3, null, null, 7, 5, null, 2, null, null, null, null, null, null, null, 3, null, null, 3, 5, null, 6, null, 4, 8]
       this.boardState = this.board.map(v => {
-        return {
-          editable: v === null
-        }
+        return { editable: v === null }
       })
       this.boardSolved = [7, 3, 4, 6, 2, 8, 9, 1, 5, 6, 1, 8, 9, 4, 5, 3, 2, 7, 9, 5, 2, 1, 3, 7, 4, 8, 6, 5, 2, 1, 4, 6, 3, 8, 7, 9, 8, 6, 7, 2, 5, 9, 1, 3, 4, 3, 4, 9, 8, 7, 1, 5, 6, 2, 4, 9, 6, 3, 8, 2, 7, 5, 1, 2, 8, 5, 7, 1, 4, 6, 9, 3, 1, 7, 3, 5, 9, 6, 2, 4, 8]
+      this.loading = false
     }
   },
-  render: h => h(App)
+  created () {
+    if (this.$route.params.state) {
+      return this.loadFromUrl()
+    } else if (process.env.NODE_ENV === 'production') {
+      this.loadFromInternet()
+    } else {
+      this.loadDefault()
+    }
+  },
+  render: h => h(App),
+  watch: {
+    board (val) {
+      this.$router.replace({
+        name: 'home-with-state',
+        params: {
+          state: this.stateStr()
+        }
+      })
+    }
+  }
 }).$mount('#app')
