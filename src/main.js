@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import axios from 'axios'
+import sodoku from './sudoku'
 
 Vue.config.productionTip = false
 
@@ -32,6 +33,7 @@ new Vue({
     board: [],
     boardState: [],
     boardSolved: [],
+    alternatives: [], // numbers from each square that helps you keep track of what each block could be
     pickNumberViewVisibleAtIndex: null,
 
     block0: blockIndexes(0),
@@ -121,32 +123,63 @@ new Vue({
       }
       return false
     },
+    resetAlternatives () {
+      this.alternatives = []
+      for (let i = 0; i < 81; i++) {
+        this.alternatives.push([
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ])
+      }
+    },
     stateStr () {
       return this.board.map((v, i) => {
-        return (this.boardState[i].editable ? '' : '!') + (v || '.')
+        var alternatives = '(' + this.alternatives[i].join('') + ')'
+        return (this.boardState[i].editable ? '' : '!') + (v || '.') + (alternatives === '()' ? '' : alternatives)
       }).join('')
     },
     loadStateStr (state) {
       this.board = Array(81)
       this.boardState = Array(81)
+      this.resetAlternatives()
       var i = 0
-      var editable = true
-      state.split('').forEach(v => {
-        if (v === '.') {
+      state = state.split('')
+      var v = state.shift()
+      while (v !== undefined) {
+        if (v === '!') {
+          v = state.shift()
+          this.board[i] = parseInt(v)
+          this.boardState[i] = { editable: false }
+          v = state.shift()
+        } else if (v === '.') {
           this.board[i] = null
           this.boardState[i] = { editable: true }
-          i += 1
-          return
+          v = state.shift()
+        } else {
+          this.board[i] = parseInt(v)
+          this.boardState[i] = { editable: true }
+          v = state.shift()
         }
-        if (v === '!') {
-          editable = false
-          return
+        if (v === '(') {
+          v = state.shift()
+          var aIndex = 0
+          var alternatives = [null, null, null, null, null, null, null, null]
+          while (v !== ')') {
+            alternatives[aIndex] = parseInt(v)
+            aIndex += 1
+            v = state.shift()
+          }
+          v = state.shift()
+          Vue.set(this.alternatives, i, alternatives)
         }
-        this.board[i] = parseInt(v)
-        this.boardState[i] = { editable: editable }
-        editable = true
         i += 1
-      })
+      }
     },
     loadFromInternet () {
       this.loading = true
@@ -158,8 +191,25 @@ new Vue({
           }
         })
         this.boardSolved = response.data.solucion.split('').map(v => { return parseInt(v) || null })
+        this.resetAlternatives()
         this.loading = false
       })
+    },
+    loadFromGenerator () {
+      this.loading = true
+      this.board = sodoku.makePuzzle().map(v => {
+        if (v !== null) {
+          return v + 1
+        }
+        return null
+      })
+      this.boardState = this.board.map(v => {
+        return {
+          editable: v === null
+        }
+      })
+      this.resetAlternatives()
+      this.loading = false
     },
     loadFromUrl () {
       this.loading = true
@@ -173,7 +223,15 @@ new Vue({
         return { editable: v === null }
       })
       this.boardSolved = [7, 3, 4, 6, 2, 8, 9, 1, 5, 6, 1, 8, 9, 4, 5, 3, 2, 7, 9, 5, 2, 1, 3, 7, 4, 8, 6, 5, 2, 1, 4, 6, 3, 8, 7, 9, 8, 6, 7, 2, 5, 9, 1, 3, 4, 3, 4, 9, 8, 7, 1, 5, 6, 2, 4, 9, 6, 3, 8, 2, 7, 5, 1, 2, 8, 5, 7, 1, 4, 6, 9, 3, 1, 7, 3, 5, 9, 6, 2, 4, 8]
+      this.resetAlternatives()
       this.loading = false
+    },
+    resetBoard () {
+      this.boardState.map((v, i) => {
+        if (v.editable) {
+          Vue.set(this.board, i, null)
+        }
+      })
     }
   },
   created () {
@@ -188,6 +246,14 @@ new Vue({
   render: h => h(App),
   watch: {
     board (val) {
+      this.$router.replace({
+        name: 'home-with-state',
+        params: {
+          state: this.stateStr()
+        }
+      })
+    },
+    alternatives (val) {
       this.$router.replace({
         name: 'home-with-state',
         params: {

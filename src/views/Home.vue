@@ -1,7 +1,9 @@
 <template>
   <div class="home">
     <div>
-      <div class="button" @click="newGame">New Game</div>
+      <span class="button" @click="newGame"> New Game </span>
+      <span class="button" @click="generate"> Generate </span>
+      <span class="button" @click="reset"> Reset </span>
     </div>
     <div style="display: inline-block; vertical-align: middle ">
       <board v-if="!$root.loading" />
@@ -22,6 +24,14 @@ export default {
       if (!this.$root.loading) {
         this.$root.loadFromInternet()
       }
+    },
+    generate () {
+      if (!this.$root.loading) {
+        this.$root.loadFromGenerator()
+      }
+    },
+    reset () {
+      this.$root.resetBoard()
     }
   }
 }

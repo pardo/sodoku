@@ -37,17 +37,7 @@ export default {
   data () {
     return {
       pickNumberViewVisibleAtIndex: false,
-      lastChange: null,
-      alternatives: [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ]
+      lastChange: 'center'
     }
   },
   computed: {
@@ -59,6 +49,9 @@ export default {
     },
     number () {
       return this.$root.board[this.index]
+    },
+    alternatives () {
+      return this.$root.alternatives[this.index]
     },
     alternativeValues () {
       var values = this.alternatives.filter(value => {
@@ -82,7 +75,7 @@ export default {
       if (this.lastChange === 'center') {
         Vue.set(this.$root.board, this.index, number)
       } else {
-        Vue.set(this.alternatives, this.lastChange, number)
+        this.setAlternative(this.lastChange, number)
       }
       this.$root.pickNumberViewVisibleAtIndex = null
     },
@@ -91,8 +84,7 @@ export default {
       var number = this.alternatives[i]
       // start with the first one
       if (number !== null) {
-        number = null
-        Vue.set(this.alternatives, i, number)
+        this.setAlternative(i, null)
       } else {
         this.lastChange = i
         this.$root.pickNumberViewVisibleAtIndex = this.index
@@ -106,6 +98,11 @@ export default {
         this.lastChange = 'center'
         this.$root.pickNumberViewVisibleAtIndex = this.index
       }
+    },
+    setAlternative (i, value) {
+      var alternatives = [...this.alternatives]
+      alternatives[i] = value
+      Vue.set(this.$root.alternatives, this.index, alternatives)
     }
   }
 }

@@ -6,7 +6,7 @@
 
 <style lang="scss">
 body {
-  background: #7e91a3;
+  background: #2c3e50;
   user-select: none;
 }
 #app {
