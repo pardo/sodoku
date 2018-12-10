@@ -197,17 +197,17 @@ new Vue({
     },
     loadFromGenerator () {
       this.loading = true
-      this.board = sodoku.makePuzzle().map(v => {
+      var boardPuzzle = sodoku.makeBoardPuzzle()
+      this.board = boardPuzzle.board.map(v => {
         if (v !== null) {
           return v + 1
         }
         return null
       })
       this.boardState = this.board.map(v => {
-        return {
-          editable: v === null
-        }
+        return { editable: v === null }
       })
+      this.boardSolved = boardPuzzle.solved
       this.resetAlternatives()
       this.loading = false
     },

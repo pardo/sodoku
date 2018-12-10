@@ -1,8 +1,6 @@
 <template>
   <div>
-
     <number-pick @selected="selected" v-show="pickNumberViewVisible" :disabled="disabled" />
-
     <div v-show="!pickNumberViewVisible" class="number" :class="{editable: editable}">
       <div>
         <div :class="{transparent: number !==null}" @click="changeAlternative(0)" class="b">{{alternatives[0]}}</div>

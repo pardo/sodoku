@@ -287,7 +287,14 @@ function makeArray (length, value) {
 }
 
 module.exports = {
-  makePuzzle: function () { return makePuzzle(solvepuzzle(makeArray(81, null))) },
+  makeBoardPuzzle: function () {
+    var data = {
+      solved: solvepuzzle(makeArray(81, null))
+    }
+    data.board = makePuzzle(data.solved)
+    return data
+  },
+  makePuzzle: makePuzzle,
   solvepuzzle: solvepuzzle,
   ratePuzzle: ratePuzzle,
   positionsFor: positionsFor
