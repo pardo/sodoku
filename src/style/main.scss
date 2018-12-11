@@ -1,0 +1,100 @@
+$font: #d08975;
+$active: #cb392d;
+$active-darker: darken(#cb392d, 15);
+$accent: #ae2230;
+$accent-darker: darken(#ae2230, 25);
+$border-lighter: #5e242d;
+$bg: #3c1b20;
+$border: darken(#251216, 5);
+
+body {
+  background: $bg;
+  user-select: none;
+}
+#app {
+  font-family: monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: $font;
+  text-align: center;
+}
+table {
+  border-collapse: collapse;
+}
+td, tr {
+  padding: 0;
+  margin: 0;
+}
+
+.block {
+  border: 0.1rem solid $border;
+}
+
+.number {
+  background: $active-darker;
+  border: 0.05rem solid $border-lighter;
+  text-align: center;
+  &.editable {
+    background: $active;
+  }
+  .b {
+    width: 1rem;
+    height: 1rem;
+    text-align: center;
+    line-height: 1rem;
+    font-size: 0.6rem;
+    color: #f6f6f6;
+  }
+  .c {
+    width: 1.2rem;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+  .taller {
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
+  .wider {
+    width: 1.2rem;
+  }
+  &.transparent .b {
+    color: transparent;
+  }
+  .disabled {
+    color: #000;
+  }
+  
+}
+
+@mixin number-hover {
+  cursor: pointer;
+  transition: all 0.3s;
+  background: $font;
+  color: $accent;
+  border-radius: 0.2rem;
+}
+
+.editable .c:hover {
+  @include number-hover();
+}
+.picker,
+.editable:not(.transparent) {
+  .b:hover:not(.disabled),
+  .c:hover {
+    @include number-hover();
+  }
+}
+
+
+.error {
+  color: $accent-darker;
+}
+
+.button {
+  cursor: pointer;
+  &:hover {
+    color: lighten($font, 10);
+    text-shadow: 0px 0px 5px #2c3e50;
+  }
+}

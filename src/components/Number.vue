@@ -1,21 +1,21 @@
 <template>
   <div>
     <number-pick @selected="selected" v-show="pickNumberViewVisible" :disabled="disabled" />
-    <table v-show="!pickNumberViewVisible" class="number" :class="{editable: editable}">
+    <table v-show="!pickNumberViewVisible" class="number" :class="{editable: editable, transparent: number !==null}">
       <tr>
-        <td :class="{transparent: number !==null}" @click="changeAlternative(0)" class="b">{{alternatives[0]}}</td>
-        <td :class="{transparent: number !==null}" @click="changeAlternative(1)" class="b wider">{{alternatives[1]}}</td>
-        <td :class="{transparent: number !==null}" @click="changeAlternative(2)" class="b">{{alternatives[2]}}</td>
+        <td @click="changeAlternative(0)" class="b">{{alternatives[0]}}</td>
+        <td @click="changeAlternative(1)" class="b wider">{{alternatives[1]}}</td>
+        <td @click="changeAlternative(2)" class="b">{{alternatives[2]}}</td>
       </tr>
       <tr>
-        <td :class="{transparent: number !==null}" @click="changeAlternative(3)" class="b taller">{{alternatives[3]}}</td>
+        <td @click="changeAlternative(3)" class="b taller">{{alternatives[3]}}</td>
         <td @click="changeCenter" class="c taller" :class="{error: error}">{{number}}</td>
-        <td :class="{transparent: number !==null}" @click="changeAlternative(4)" class="b taller">{{alternatives[4]}}</td>
+        <td @click="changeAlternative(4)" class="b taller">{{alternatives[4]}}</td>
       </tr>
       <tr>
-        <td :class="{transparent: number !==null}" @click="changeAlternative(5)" class="b">{{alternatives[5]}}</td>
-        <td :class="{transparent: number !==null}" @click="changeAlternative(6)" class="b wider">{{alternatives[6]}}</td>
-        <td :class="{transparent: number !==null}" @click="changeAlternative(7)" class="b">{{alternatives[7]}}</td>
+        <td @click="changeAlternative(5)" class="b">{{alternatives[5]}}</td>
+        <td @click="changeAlternative(6)" class="b wider">{{alternatives[6]}}</td>
+        <td @click="changeAlternative(7)" class="b">{{alternatives[7]}}</td>
       </tr>
     </table>
   </div>
@@ -105,55 +105,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.number {
-  background: #f0f0f0;
-  border: 0.05rem solid rgb(184, 196, 184);
-  text-align: center;
-}
-.editable {
-  background: #ffffff;
-}
-.b {
-  width: 1rem;
-  height: 1rem;
-  text-align: center;
-  line-height: 1rem;
-  font-size: 0.6rem;
-  color: #aaa;
-}
-.c {
-  width: 1.2rem;
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.editable {
-  .b, .c {
-    cursor: pointer;
-  }
-}
-
-.editable {
-  .b:hover:not(.transparent),
-  .c:hover {
-    transition: background 0.3s;
-    background: #f5f5f5;
-    border-radius: 0.2rem;
-  }
-}
-.taller {
-  height: 1.2rem;
-  line-height: 1.2rem;
-}
-.wider {
-  width: 1.2rem;
-}
-.error {
-  color: #f44336;
-}
-.transparent {
-  color: transparent;
-}
-</style>

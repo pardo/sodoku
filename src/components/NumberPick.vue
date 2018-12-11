@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table class="number">
+    <table class="number picker">
       <tr>
         <td @click="select(1)" class="b" :class="{disabled: isDisabled(1)}">1</td>
         <td @click="select(2)" class="b wider" :class="{disabled: isDisabled(2)}">2</td>
@@ -36,37 +36,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.number {
-  background: #ffffff;
-  border: 0.05rem solid rgb(184, 196, 184);
-  text-align: center;
-}
-.b {
-  cursor: pointer;
-  width: 1rem;
-  height: 1rem;
-  vertical-align: middle;
-  text-align: center;
-  line-height: 1rem;
-  font-size: 0.6rem;
-  color: #aaa;
-}
-.b:hover:not(.disabled) {
-  transition: 0.3s background;
-  background: #f5f5f5;
-  color: #000;
-  border-radius: 0.2rem;
-}
-.taller {
-  height: 1.2rem;
-  line-height: 1.2rem;
-}
-.wider {
-  width: 1.2rem;
-}
-.disabled {
-  color: #f6f6f6;
-}
-</style>

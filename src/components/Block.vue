@@ -1,15 +1,15 @@
 <template>
-  <div class="block">
-    <div>
-      <number :index="indexes[0]" /><number :index="indexes[1]" /><number :index="indexes[2]" />
-    </div>
-    <div>
-      <number :index="indexes[3]" /><number :index="indexes[4]" /><number :index="indexes[5]" />
-    </div>
-    <div>
-      <number :index="indexes[6]" /><number :index="indexes[7]" /><number :index="indexes[8]" />
-    </div>
-  </div>
+  <table class="block">
+    <tr>
+      <td><number :index="indexes[0]" /></td><td><number :index="indexes[3]" /></td><td><number :index="indexes[6]" /></td>
+    </tr>
+    <tr>
+      <td><number :index="indexes[1]" /></td><td><number :index="indexes[4]" /></td><td><number :index="indexes[7]" /></td>
+    </tr>
+    <tr>
+      <td><number :index="indexes[2]" /></td><td><number :index="indexes[5]" /></td><td><number :index="indexes[8]" /></td>
+    </tr>
+  </table>
 </template>
 
 <script>
@@ -24,10 +24,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.block {
-  display: flex;
-  border: 0.1rem solid #000;
-}
-</style>

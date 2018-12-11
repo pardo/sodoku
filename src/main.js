@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 import sodoku from './sudoku'
+import '@/style/main.scss'
 
 Vue.config.productionTip = false
 
