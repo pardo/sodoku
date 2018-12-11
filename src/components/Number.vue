@@ -1,23 +1,23 @@
 <template>
   <div>
     <number-pick @selected="selected" v-show="pickNumberViewVisible" :disabled="disabled" />
-    <div v-show="!pickNumberViewVisible" class="number" :class="{editable: editable}">
-      <div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(0)" class="b">{{alternatives[0]}}</div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(1)" class="b wider">{{alternatives[1]}}</div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(2)" class="b">{{alternatives[2]}}</div>
-      </div>
-      <div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(3)" class="b taller">{{alternatives[3]}}</div>
-        <div @click="changeCenter" class="c taller" :class="{error: error}">{{number}}</div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(4)" class="b taller">{{alternatives[4]}}</div>
-      </div>
-      <div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(5)" class="b">{{alternatives[5]}}</div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(6)" class="b wider">{{alternatives[6]}}</div>
-        <div :class="{transparent: number !==null}" @click="changeAlternative(7)" class="b">{{alternatives[7]}}</div>
-      </div>
-    </div>
+    <table v-show="!pickNumberViewVisible" class="number" :class="{editable: editable}">
+      <tr>
+        <td :class="{transparent: number !==null}" @click="changeAlternative(0)" class="b">{{alternatives[0]}}</td>
+        <td :class="{transparent: number !==null}" @click="changeAlternative(1)" class="b wider">{{alternatives[1]}}</td>
+        <td :class="{transparent: number !==null}" @click="changeAlternative(2)" class="b">{{alternatives[2]}}</td>
+      </tr>
+      <tr>
+        <td :class="{transparent: number !==null}" @click="changeAlternative(3)" class="b taller">{{alternatives[3]}}</td>
+        <td @click="changeCenter" class="c taller" :class="{error: error}">{{number}}</td>
+        <td :class="{transparent: number !==null}" @click="changeAlternative(4)" class="b taller">{{alternatives[4]}}</td>
+      </tr>
+      <tr>
+        <td :class="{transparent: number !==null}" @click="changeAlternative(5)" class="b">{{alternatives[5]}}</td>
+        <td :class="{transparent: number !==null}" @click="changeAlternative(6)" class="b wider">{{alternatives[6]}}</td>
+        <td :class="{transparent: number !==null}" @click="changeAlternative(7)" class="b">{{alternatives[7]}}</td>
+      </tr>
+    </table>
   </div>
 </template>
 
@@ -110,7 +110,6 @@ export default {
 .number {
   background: #f0f0f0;
   border: 0.05rem solid rgb(184, 196, 184);
-  display: inline-block;
   text-align: center;
 }
 .editable {
@@ -119,8 +118,6 @@ export default {
 .b {
   width: 1rem;
   height: 1rem;
-  display: inline-block;
-  vertical-align: middle;
   text-align: center;
   line-height: 1rem;
   font-size: 0.6rem;
@@ -128,8 +125,6 @@ export default {
 }
 .c {
   width: 1.2rem;
-  display: inline-block;
-  vertical-align: middle;
   text-align: center;
   font-size: 1.2rem;
 }

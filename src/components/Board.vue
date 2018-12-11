@@ -1,9 +1,9 @@
 <template>
-  <div class="board">
-    <div><block :indexes="$root.block0" /><block :indexes="$root.block1" /><block :indexes="$root.block2" /></div>
-    <div><block :indexes="$root.block3" /><block :indexes="$root.block4" /><block :indexes="$root.block5" /></div>
-    <div><block :indexes="$root.block6" /><block :indexes="$root.block7" /><block :indexes="$root.block8" /></div>
-  </div>
+  <table class="board">
+    <tr><td><block :indexes="$root.block0" /></td><td><block :indexes="$root.block3" /></td><td><block :indexes="$root.block6" /></td></tr>
+    <tr><td><block :indexes="$root.block1" /></td><td><block :indexes="$root.block4" /></td><td><block :indexes="$root.block7" /></td></tr>
+    <tr><td><block :indexes="$root.block2" /></td><td><block :indexes="$root.block5" /></td><td><block :indexes="$root.block8" /></td></tr>
+  </table>
 </template>
 
 <script>
@@ -15,9 +15,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.board {
-  display: flex;
-}
-</style>

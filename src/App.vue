@@ -17,4 +17,12 @@ body {
   color: #2c3e50;
   text-align: center;
 }
+table {
+  border-collapse: collapse;
+}
+td, tr {
+  padding: 0;
+  margin: 0;
+}
+
 </style>
