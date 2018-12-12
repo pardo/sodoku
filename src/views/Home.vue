@@ -21,8 +21,10 @@ export default {
   components: {
     Board
   },
-  data: {
-    matchName: ''
+  data () {
+    return {
+      matchName: ''
+    }
   },
   methods: {
     newGame () {
@@ -41,7 +43,7 @@ export default {
     },
     connect () {
       this.matchName = window.prompt('Match name?') || ''
-      this.matchName = this.matchName.replace(/[^a-z0-9]/g,'')
+      this.matchName = this.matchName.replace(/[^a-z0-9]/g, '')
       if (this.matchName) {
         this.$root.connectMath(this.matchName)
       }

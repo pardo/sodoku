@@ -273,7 +273,6 @@ new Vue({
               this.loadStateStr(value)
               this.loading = false
             } catch (e) {
-              console.log('Error Loading Match Data')
               this.loadFromGenerator()
             }
           } else {
