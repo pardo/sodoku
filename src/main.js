@@ -36,7 +36,8 @@ new Vue({
     boardSolved: [],
     alternatives: [], // numbers from each square that helps you keep track of what each block could be
     pickNumberViewVisibleAtIndex: null,
-
+    firebaseDatabase: window.firebase.database(),
+    databaseRef: null,
     block0: blockIndexes(0),
     block1: blockIndexes(3),
     block2: blockIndexes(6),
@@ -66,6 +67,11 @@ new Vue({
     row6: rowIndexes(6),
     row7: rowIndexes(7),
     row8: rowIndexes(8)
+  },
+  computed: {
+    isConnected () {
+      return this.databaseRef != null
+    }
   },
   methods: {
     getCol (index) {
@@ -140,8 +146,12 @@ new Vue({
       }
     },
     stateStr () {
+      var sortedAlternatives
+      var alternatives
       return this.board.map((v, i) => {
-        var alternatives = '(' + this.alternatives[i].join('') + ')'
+        sortedAlternatives = [...this.alternatives[i]]
+        sortedAlternatives.sort()
+        alternatives = '(' + sortedAlternatives.join('') + ')'
         return (this.boardState[i].editable ? '' : '!') + (v || '.') + (alternatives === '()' ? '' : alternatives)
       }).join('')
     },
@@ -233,6 +243,57 @@ new Vue({
           Vue.set(this.board, i, null)
         }
       })
+    },
+    updateURL () {
+      this.$router.replace({
+        name: 'home-with-state',
+        params: {
+          state: this.stateStr()
+        }
+      })
+    },
+    disconnect () {
+      if (this.databaseRef) {
+        this.databaseRef.off('value')
+      }
+      this.databaseRef = null
+    },
+    connectMath (name) {
+      this.loading = true
+      if (this.databaseRef) {
+        this.databaseRef.off('value')
+      }
+      this.databaseRef = this.firebaseDatabase.ref(`matchs/${name}`)
+      this.databaseRef
+        .ref.once('value')
+        .then(snapshot => {
+          var value = snapshot.val()
+          if (value) {
+            try {
+              this.loadStateStr(value)
+              this.loading = false
+            } catch (e) {
+              console.log('Error Loading Match Data')
+              this.loadFromGenerator()
+            }
+          } else {
+            this.loadFromGenerator()
+          }
+          this.databaseRef.on('value', snapshot => {
+            this.receiveDatabaseUpdate(snapshot)
+          })
+        })
+    },
+    syncRealTimeDatabase () {
+      if (this.databaseRef && !this.loading) {
+        this.databaseRef.set(this.stateStr())
+      }
+    },
+    receiveDatabaseUpdate (snapshot) {
+      if (snapshot.val() !== this.stateStr()) {
+        // real update
+        this.loadStateStr(snapshot.val())
+      }
     }
   },
   created () {
@@ -247,20 +308,16 @@ new Vue({
   render: h => h(App),
   watch: {
     board (val) {
-      this.$router.replace({
-        name: 'home-with-state',
-        params: {
-          state: this.stateStr()
-        }
-      })
+      if (!this.loading) {
+        this.updateURL()
+        this.syncRealTimeDatabase()
+      }
     },
     alternatives (val) {
-      this.$router.replace({
-        name: 'home-with-state',
-        params: {
-          state: this.stateStr()
-        }
-      })
+      if (!this.loading) {
+        this.updateURL()
+        this.syncRealTimeDatabase()
+      }
     }
   }
 }).$mount('#app')

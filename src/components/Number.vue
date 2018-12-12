@@ -100,6 +100,7 @@ export default {
     setAlternative (i, value) {
       var alternatives = [...this.alternatives]
       alternatives[i] = value
+      alternatives.sort()
       Vue.set(this.$root.alternatives, this.index, alternatives)
     }
   }

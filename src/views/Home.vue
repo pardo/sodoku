@@ -1,6 +1,8 @@
 <template>
   <div class="home">
     <div>
+      <span class="button" v-show="!$root.isConnected" @click="connect"> Connect </span>
+      <span class="button" v-show="$root.isConnected" @click="$root.disconnect"> Disconnect ({{matchName}}) </span>
       <span class="button" @click="newGame"> New Game </span>
       <span class="button" @click="generate"> Generate </span>
       <span class="button" @click="reset"> Reset </span>
@@ -19,6 +21,9 @@ export default {
   components: {
     Board
   },
+  data: {
+    matchName: ''
+  },
   methods: {
     newGame () {
       if (!this.$root.loading) {
@@ -32,6 +37,14 @@ export default {
     },
     reset () {
       this.$root.resetBoard()
+      this.$root.resetAlternative()
+    },
+    connect () {
+      this.matchName = window.prompt('Match name?') || ''
+      this.matchName = this.matchName.replace(/[^a-z0-9]/g,'')
+      if (this.matchName) {
+        this.$root.connectMath(this.matchName)
+      }
     }
   }
 }
