@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div @mouseenter="setHoverPlace">
     <number-pick @selected="selected" v-show="pickNumberViewVisible" :disabled="disabled" />
-    <table v-show="!pickNumberViewVisible" class="number" :class="{editable: editable, transparent: number !==null}">
+    <table v-show="!pickNumberViewVisible" class="number" :class="{active: isHovered, editable: editable, transparent: number !==null}">
       <tr>
         <td @click="changeAlternative(0)" class="b">{{alternatives[0]}}</td>
         <td @click="changeAlternative(1)" class="b wider">{{alternatives[1]}}</td>
@@ -39,6 +39,9 @@ export default {
     }
   },
   computed: {
+    isHovered () {
+      return this.$root.hoveredIndexes.includes(this.index)
+    },
     error () {
       return this.$root.hasError(this.index)
     },
@@ -69,6 +72,9 @@ export default {
     }
   },
   methods: {
+    setHoverPlace () {
+      this.$root.localHoveredNumberIndex = this.index
+    },
     selected (number) {
       if (this.lastChange === 'center') {
         Vue.set(this.$root.board, this.index, number)

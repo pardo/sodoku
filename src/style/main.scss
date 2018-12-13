@@ -33,8 +33,11 @@ td, tr {
 
 .number {
   background: $active-darker;
-  border: 0.05rem solid $border-lighter;
+  border: 0.10rem solid $border-lighter;
   text-align: center;
+  &.active {
+    border: 0.10rem solid lighten(adjust-hue($border-lighter, 50),20);
+  }
   &.editable {
     background: $active;
   }

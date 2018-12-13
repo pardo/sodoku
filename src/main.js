@@ -38,6 +38,9 @@ new Vue({
     pickNumberViewVisibleAtIndex: null,
     firebaseDatabase: window.firebase.database(),
     databaseRef: null,
+    databaseActiveRef: null,
+    localHoveredNumberIndex: 0,
+    hoveredIndexes: [],
     block0: blockIndexes(0),
     block1: blockIndexes(3),
     block2: blockIndexes(6),
@@ -255,15 +258,22 @@ new Vue({
     disconnect () {
       if (this.databaseRef) {
         this.databaseRef.off('value')
+        this.databaseActiveRef.off('value')
       }
       this.databaseRef = null
+      this.databaseActiveRef = null
     },
     connectMath (name) {
       this.loading = true
       if (this.databaseRef) {
         this.databaseRef.off('value')
+        this.databaseActiveRef.off('value')
       }
       this.databaseRef = this.firebaseDatabase.ref(`matchs/${name}`)
+      this.databaseActiveRef = this.firebaseDatabase.ref(`positions/${name}`)
+      this.databaseActiveRef.ref.limitToLast(5).on('value', snapshot => {
+        this.hoveredIndexes = Object.keys(snapshot.val()).map(key => snapshot.val()[key])
+      })
       this.databaseRef
         .ref.once('value')
         .then(snapshot => {
@@ -293,9 +303,17 @@ new Vue({
         // real update
         this.loadStateStr(snapshot.val())
       }
+    },
+    sendActivePosition () {
+      if (this.databaseActiveRef) {
+        this.databaseActiveRef.push(this.localHoveredNumberIndex)
+      }
     }
   },
   created () {
+    setInterval(() => {
+      this.sendActivePosition()
+    }, 2000)
     if (this.$route.params.state) {
       return this.loadFromUrl()
     } else if (process.env.NODE_ENV === 'production') {
