@@ -4,6 +4,7 @@ import router from './router'
 import axios from 'axios'
 import sodoku from './sudoku'
 import '@/style/main.scss'
+import _ from 'lodash'
 
 Vue.config.productionTip = false
 
@@ -27,9 +28,24 @@ function rowIndexes (rowI) {
   ]
 }
 
+function uuidv4 () {
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  )
+}
+
+function getSodukuID () {
+  var sodukuID = window.localStorage.getItem('soduku')
+  if (!sodukuID) {
+    window.localStorage.setItem('soduku', uuidv4())
+  }
+  return window.localStorage.getItem('soduku')
+}
+
 new Vue({
   router,
   data: {
+    sodukuID: getSodukuID(),
     loading: true,
     board: [],
     boardState: [],
@@ -38,7 +54,8 @@ new Vue({
     pickNumberViewVisibleAtIndex: null,
     firebaseDatabase: window.firebase.database(),
     databaseRef: null,
-    databaseActiveRef: null,
+    databasePositionsRef: null,
+    databaseMyPositionRef: null,
     localHoveredNumberIndex: 0,
     hoveredIndexes: [],
     block0: blockIndexes(0),
@@ -258,21 +275,26 @@ new Vue({
     disconnect () {
       if (this.databaseRef) {
         this.databaseRef.off('value')
-        this.databaseActiveRef.off('value')
+        this.databaseMyPositionRef.off('value')
+        this.databasePositionsRef.off('value')
       }
       this.databaseRef = null
-      this.databaseActiveRef = null
+      this.databaseMyPositionRef = null
+      this.databasePositionsRef = null
     },
     connectMath (name) {
       this.loading = true
       if (this.databaseRef) {
-        this.databaseRef.off('value')
-        this.databaseActiveRef.off('value')
+        this.disconnect()
       }
       this.databaseRef = this.firebaseDatabase.ref(`matchs/${name}`)
-      this.databaseActiveRef = this.firebaseDatabase.ref(`positions/${name}`)
-      this.databaseActiveRef.ref.limitToLast(5).on('value', snapshot => {
-        this.hoveredIndexes = Object.keys(snapshot.val()).map(key => snapshot.val()[key])
+      this.databaseMyPositionRef = this.firebaseDatabase.ref(`positions/${name}/${this.sodukuID}`)
+      this.databasePositionsRef = this.firebaseDatabase.ref(`positions/${name}`)
+      this.databasePositionsRef.set({})
+      this.databasePositionsRef.on('value', snapshot => {
+        if (snapshot.val()) {
+          this.hoveredIndexes = Object.keys(snapshot.val()).map(key => snapshot.val()[key])
+        }
       })
       this.databaseRef
         .ref.once('value')
@@ -305,15 +327,16 @@ new Vue({
       }
     },
     sendActivePosition () {
-      if (this.databaseActiveRef) {
-        this.databaseActiveRef.push(this.localHoveredNumberIndex)
+      if (this.databaseMyPositionRef) {
+        this.databaseMyPositionRef.set(this.localHoveredNumberIndex)
       }
-    }
+    },
+    setHoveredPosition: _.debounce(function (index) {
+      this.localHoveredNumberIndex = index
+      this.sendActivePosition()
+    }, 500)
   },
   created () {
-    setInterval(() => {
-      this.sendActivePosition()
-    }, 2000)
     if (this.$route.params.state) {
       return this.loadFromUrl()
     } else if (process.env.NODE_ENV === 'production') {

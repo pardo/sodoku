@@ -73,7 +73,7 @@ export default {
   },
   methods: {
     setHoverPlace () {
-      this.$root.localHoveredNumberIndex = this.index
+      this.$root.setHoveredPosition(this.index)
     },
     selected (number) {
       if (this.lastChange === 'center') {
