@@ -57,7 +57,7 @@ new Vue({
     databasePositionsRef: null,
     databaseMyPositionRef: null,
     localHoveredNumberIndex: 0,
-    hoveredIndexes: [],
+    hoveredIndexesRemote: [],
     block0: blockIndexes(0),
     block1: blockIndexes(3),
     block2: blockIndexes(6),
@@ -91,6 +91,11 @@ new Vue({
   computed: {
     isConnected () {
       return this.databaseRef != null
+    },
+    hoveredIndexes () {
+      var positions = { ...this.hoveredIndexesRemote }
+      positions[this.sodukuID] = this.localHoveredNumberIndex
+      return Object.keys(positions).map(key => positions[key])
     }
   },
   methods: {
@@ -170,9 +175,12 @@ new Vue({
       var alternatives
       return this.board.map((v, i) => {
         sortedAlternatives = [...this.alternatives[i]]
-        sortedAlternatives.sort()
+        sortedAlternatives = sortedAlternatives.map(m => {
+          return m || '.'
+        })
         alternatives = '(' + sortedAlternatives.join('') + ')'
-        return (this.boardState[i].editable ? '' : '!') + (v || '.') + (alternatives === '()' ? '' : alternatives)
+        alternatives = (alternatives === '(........)' ? '' : alternatives)
+        return (this.boardState[i].editable ? '' : '!') + (v || '.') + alternatives
       }).join('')
     },
     loadStateStr (state) {
@@ -202,7 +210,9 @@ new Vue({
           var aIndex = 0
           var alternatives = [null, null, null, null, null, null, null, null]
           while (v !== ')') {
-            alternatives[aIndex] = parseInt(v)
+            if (v !== '.') {
+              alternatives[aIndex] = parseInt(v)
+            }
             aIndex += 1
             v = state.shift()
           }
@@ -292,9 +302,7 @@ new Vue({
       this.databasePositionsRef = this.firebaseDatabase.ref(`positions/${name}`)
       this.databasePositionsRef.set({})
       this.databasePositionsRef.on('value', snapshot => {
-        if (snapshot.val()) {
-          this.hoveredIndexes = Object.keys(snapshot.val()).map(key => snapshot.val()[key])
-        }
+        this.receiveActivePositions(snapshot.val() || {})
       })
       this.databaseRef
         .ref.once('value')
@@ -308,7 +316,7 @@ new Vue({
               this.loadFromGenerator()
             }
           } else {
-            this.loadFromGenerator()
+            this.loading = false
           }
           this.databaseRef.on('value', snapshot => {
             this.receiveDatabaseUpdate(snapshot)
@@ -321,20 +329,24 @@ new Vue({
       }
     },
     receiveDatabaseUpdate (snapshot) {
-      if (snapshot.val() !== this.stateStr()) {
+      if (snapshot.val() && snapshot.val() !== this.stateStr()) {
         // real update
         this.loadStateStr(snapshot.val())
       }
     },
-    sendActivePosition () {
+    receiveActivePositions (positions) {
+      // being called from firebase event
+      this.hoveredIndexesRemote = positions
+    },
+    sendActivePosition: _.throttle(function (index) {
       if (this.databaseMyPositionRef) {
         this.databaseMyPositionRef.set(this.localHoveredNumberIndex)
       }
-    },
-    setHoveredPosition: _.debounce(function (index) {
+    }, 500, { trailing: true }),
+    setHoveredPosition (index) {
       this.localHoveredNumberIndex = index
       this.sendActivePosition()
-    }, 500)
+    }
   },
   created () {
     if (this.$route.params.state) {
