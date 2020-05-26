@@ -7,6 +7,7 @@
       <span class="button" @click="generate"> Generate </span>
       <span class="button" @click="reset"> Reset </span>
     </div>
+    <div v-show="$root.isVictory">VICTORY</div>
     <div style="display: inline-block; vertical-align: middle ">
       <board v-if="!$root.loading" />
     </div>

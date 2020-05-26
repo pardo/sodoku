@@ -96,6 +96,18 @@ new Vue({
       var positions = { ...this.hoveredIndexesRemote }
       positions[this.sodukuID] = this.localHoveredNumberIndex
       return Object.keys(positions).map(key => positions[key])
+    },
+    isVictory () {
+      if (this.board.includes(null)) {
+        return false
+      }
+
+      for (let idx = 0; idx < 81; idx++) {
+        if (this.hasError(idx)) {
+          return false
+        }
+      }
+      return true
     }
   },
   methods: {
@@ -260,6 +272,8 @@ new Vue({
     loadDefault () {
       this.loading = true
       this.board = [null, 3, null, null, 2, 8, null, null, 5, 6, null, null, 9, 4, 5, 3, 2, null, null, null, 2, null, null, null, 4, null, null, 5, null, null, 4, 6, null, null, 7, null, null, null, 7, 2, null, null, null, null, 4, null, 4, null, 8, 7, null, null, 6, null, 4, 9, 6, 3, null, null, 7, 5, null, 2, null, null, null, null, null, null, null, 3, null, null, 3, 5, null, 6, null, 4, 8]
+      // uncomment to have a semi solved puzzle for testing
+      // this.board = [null, 3, 4, 6, 2, 8, 9, 1, 5, 6, 1, 8, 9, 4, 5, 3, 2, 7, 9, 5, 2, 1, 3, 7, 4, 8, 6, 5, 2, 1, 4, 6, 3, 8, 7, 9, 8, 6, 7, 2, 5, 9, 1, 3, 4, 3, 4, 9, 8, 7, 1, 5, 6, 2, 4, 9, 6, 3, 8, 2, 7, 5, 1, 2, 8, 5, 7, 1, 4, 6, 9, 3, 1, 7, 3, 5, 9, 6, 2, 4, 8]
       this.boardState = this.board.map(v => {
         return { editable: v === null }
       })

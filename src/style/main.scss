@@ -1,4 +1,4 @@
-$font: #d08975;
+$font: #dbdbdb;
 $active: #cb392d;
 $active-darker: darken(#cb392d, 15);
 $accent: #ae2230;
@@ -6,6 +6,9 @@ $accent-darker: darken(#ae2230, 25);
 $border-lighter: #5e242d;
 $bg: #3c1b20;
 $border: darken(#251216, 5);
+$alternative-font: #f6f6f6;
+$text-shadow: #000;
+$font-error: #ff0b26;
 
 body {
   background: $bg;
@@ -47,7 +50,8 @@ td, tr {
     text-align: center;
     line-height: 1rem;
     font-size: 0.6rem;
-    color: #f6f6f6;
+    color: $alternative-font;
+    text-shadow: 0px 0px 3px $text-shadow;
   }
   .c {
     width: 1.2rem;
@@ -63,6 +67,7 @@ td, tr {
   }
   &.transparent .b {
     color: transparent;
+    text-shadow: none;
   }
   .disabled {
     color: #000;
@@ -91,7 +96,8 @@ td, tr {
 
 
 .error {
-  color: $accent-darker;
+  color: $font-error;
+  text-shadow: 0 0 2px $text-shadow;
 }
 
 .button {
